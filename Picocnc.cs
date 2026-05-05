@@ -31,6 +31,8 @@ public static partial class Picocnc
         Library.oViewer().SetGroupMaterial(10, "CCCCCC", 0.1f, 0.8f);
         // Group 11: drag chains (dark plastic)
         Library.oViewer().SetGroupMaterial(11, "333322", 0.5f, 0.1f);
+        // Group 12: safety (bright yellow/red)
+        Library.oViewer().SetGroupMaterial(12, "FF4444", 0.2f, 0.1f);
 
         // Build the full machine (components appear live in viewer)
         Voxels voxMachine = voxConstruct();

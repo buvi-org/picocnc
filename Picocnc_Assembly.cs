@@ -65,6 +65,11 @@ public static partial class Picocnc
         voxMachine += vox;
         Library.oViewer().Add(vox, 11);
 
+        // 12. Safety — limit switches, end stops, E-stop
+        vox = voxConstructSafety();
+        voxMachine += vox;
+        Library.oViewer().Add(vox, 12);
+
         return voxMachine;
     }
 
@@ -87,6 +92,7 @@ public static partial class Picocnc
         ExportStl(voxConstructMotorMounts(), "MotorMounts");
         ExportStl(voxConstructLeadScrews(), "LeadScrews");
         ExportStl(voxConstructDragChains(), "DragChains");
+        ExportStl(voxConstructSafety(), "Safety");
 
         Library.Log("Component export complete.");
     }
