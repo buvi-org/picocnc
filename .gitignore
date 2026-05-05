@@ -1,0 +1,7 @@
+bin/
+obj/
+*.stl
+*.log
+.vs/
+.DS_Store
+imgui.ini
