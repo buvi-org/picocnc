@@ -36,6 +36,19 @@ public static partial class Picocnc
         // Group 13: toolpath (bright green)
         Library.oViewer().SetGroupMaterial(13, "00FF44", 0.2f, 0.5f);
 
+        // ---- COTS parts selection ----
+        // Select real-world components based on work area, material, and budget
+        var req = new CNCRequirements
+        {
+            fWorkAreaX = fWorkAreaX,
+            fWorkAreaY = fWorkAreaY,
+            fWorkAreaZ = fWorkAreaZ,
+            eMaterial  = MaterialToCut.Aluminum,
+            eBudget    = BudgetTier.Standard
+        };
+        CNCSelectedParts parts = SelectParts(req);
+        PrintPartsList(parts);
+
         // Build the full machine (components appear live in viewer)
         Voxels voxMachine = voxConstruct();
 
