@@ -59,6 +59,12 @@ public static partial class Picocnc
         AnalyzeUprights();
         AnalyzeLeadScrews();
 
+        // --- Finite Element Analysis (in-process, BriefFiniteElement.NET) ---
+        RunFEAnalysis();
+
+        // --- CalculiX batch FEA (external subprocess) ---
+        RunCalculixAnalysis();
+
         Library.Log("\n===  BEAM ANALYSIS COMPLETE  ===============================");
         Library.Log("============================================================\n");
     }

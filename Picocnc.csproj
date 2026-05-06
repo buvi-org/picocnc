@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="PicoGK" Version="2.0.0-beta11" />
+    <PackageReference Include="BriefFiniteElement.Net" Version="2.0.5" />
   </ItemGroup>
 
 </Project>
