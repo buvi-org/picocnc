@@ -33,11 +33,31 @@ public static partial class Picocnc
         Library.oViewer().SetGroupMaterial(11, "333322", 0.5f, 0.1f);
         // Group 12: safety (bright yellow/red)
         Library.oViewer().SetGroupMaterial(12, "FF4444", 0.2f, 0.1f);
+        // Group 13: toolpath (bright green)
+        Library.oViewer().SetGroupMaterial(13, "00FF44", 0.2f, 0.5f);
 
         // Build the full machine (components appear live in viewer)
         Voxels voxMachine = voxConstruct();
 
         Library.Log("PicoCNC construction complete.");
+
+        // --- Collision verification pass ---
+        // Rebuilds each component individually and checks all pairwise
+        // overlaps. Reports unexpected collisions (parts embedded into
+        // each other at default mid-travel positions).
+        VerifyCollisions();
+
+        // --- G-code toolpath visualization ---
+        // Load and visualize a sample G-code file if one exists in the
+        // project output directory. To use, place a .nc file named
+        // "sample.nc" alongside Picocnc.exe (or uncomment and provide
+        // an explicit path below).
+        string strGCode = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "sample.nc");
+        if (File.Exists(strGCode))
+            LoadAndVisualizeGCode(strGCode);
+
+        // --- Beam structural analysis ---
+        RunBeamAnalysis();
 
         // Export STLs (this is slow — do it after preview)
         ExportStl(voxMachine, "Assembly");
