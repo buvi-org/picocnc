@@ -75,4 +75,12 @@ public static partial class Picocnc
     // --- Voxel resolution ---
     // 2.0mm = fast preview (~30s); 0.5mm = production quality (~10-30min)
     public const float fVoxelSizeMM = 2.0f;
+
+    // --- Material to cut ---
+    // Determines spindle power and guideway rigidity selection
+    public const MaterialToCut eCutMaterial = MaterialToCut.Aluminum;
+
+    // --- Budget tier ---
+    // Determines drive type (lead screw vs ball screw) and component grade
+    public const BudgetTier eBudgetTier = BudgetTier.Standard;
 }

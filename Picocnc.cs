@@ -7,6 +7,7 @@ public static partial class Picocnc
         Library.Log("PicoCNC — CNC Machine Generator");
         Library.Log($"Voxel size: {fVoxelSizeMM} mm");
         Library.Log($"Work area: {fWorkAreaX} x {fWorkAreaY} x {fWorkAreaZ} mm");
+        Library.Log($"Material: {eCutMaterial}, Budget: {eBudgetTier}");
 
         // Set up viewer groups with distinct colors per component type
         // Group 1: structural (steel gray)
@@ -43,8 +44,8 @@ public static partial class Picocnc
             fWorkAreaX = fWorkAreaX,
             fWorkAreaY = fWorkAreaY,
             fWorkAreaZ = fWorkAreaZ,
-            eMaterial  = MaterialToCut.Aluminum,
-            eBudget    = BudgetTier.Standard
+            eMaterial  = eCutMaterial,
+            eBudget    = eBudgetTier
         };
         CNCSelectedParts parts = SelectParts(req);
         PrintPartsList(parts);
