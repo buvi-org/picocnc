@@ -98,6 +98,19 @@ public static partial class Picocnc
         // Isotropic material
         var material = new UniformIsotropicMaterial(E, nu);
 
+        // BarElement has no torsional stiffness — fix RX at every node
+        // so the global stiffness matrix stays positive definite for Cholesky.
+        for (int i = 0; i < nNodes; i++)
+        {
+            aNodes[i].Constraints = new Constraint(
+                DofConstraint.Released,
+                DofConstraint.Released,
+                DofConstraint.Released,
+                DofConstraint.Fixed,    // RX — no torsional DOF in BarElement
+                DofConstraint.Released,
+                DofConstraint.Released);
+        }
+
         for (int i = 0; i < nElements; i++)
         {
             var el = new BarElement(aNodes[i], aNodes[i + 1])
@@ -106,31 +119,28 @@ public static partial class Picocnc
                 Material = material,
                 Label    = $"E{i}"
             };
-            // Enable full 3D beam bending: combine Y and Z bending behaviors.
-            // BriefFiniteElement.NET v2 uses BarElementBehaviour as flag bits.
-            el.Behavior = BarElementBehaviour.BeamYEulerBernoulli
+            el.Behavior = BarElementBehaviour.Truss
+                        | BarElementBehaviour.BeamYEulerBernoulli
                         | BarElementBehaviour.BeamZEulerBernoulli;
             model.Elements.Add(el);
         }
 
-        // --- Boundary conditions: simply supported ---
-        // Left support: fix DY, DZ (allow DX for thermal, allow all rotations)
+        // Simply supported: UX, UY, UZ fixed at left; UY, UZ fixed at right
         aNodes[0].Constraints = new Constraint(
-            DofConstraint.Released, // DX — free for thermal expansion
+            DofConstraint.Fixed,    // DX — axial restraint
             DofConstraint.Fixed,    // DY — support
             DofConstraint.Fixed,    // DZ — support
-            DofConstraint.Released, // RX — allow rotation
-            DofConstraint.Released, // RY — allow rotation
-            DofConstraint.Released);// RZ — allow rotation
+            DofConstraint.Fixed,    // RX — no torsion
+            DofConstraint.Released, // RY — allow bending
+            DofConstraint.Released);// RZ — allow bending
 
-        // Right support: fix DY, DZ
         aNodes[nNodes - 1].Constraints = new Constraint(
-            DofConstraint.Released, // DX
-            DofConstraint.Fixed,    // DY
-            DofConstraint.Fixed,    // DZ
-            DofConstraint.Released, // RX
-            DofConstraint.Released, // RY
-            DofConstraint.Released);// RZ
+            DofConstraint.Released, // DX — free for thermal
+            DofConstraint.Fixed,    // DY — support
+            DofConstraint.Fixed,    // DZ — support
+            DofConstraint.Fixed,    // RX — no torsion
+            DofConstraint.Released, // RY — allow bending
+            DofConstraint.Released);// RZ — allow bending
 
         // --- Load case: center point load ---
         // Note on sign convention:
