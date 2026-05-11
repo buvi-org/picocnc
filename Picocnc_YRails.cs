@@ -10,7 +10,7 @@ public static partial class Picocnc
     /// </summary>
     public static Voxels voxConstructYRails()
     {
-        Library.Log("Building Y-axis rails...");
+        Log("Building Y-axis rails...");
 
         Voxels voxYRails = new();
 
@@ -184,7 +184,7 @@ public static partial class Picocnc
             voxYRails += voxBearing;
         }
 
-        Library.Log("Y-axis rails done.");
+        Log("Y-axis rails done.");
         return voxYRails;
     }
 }

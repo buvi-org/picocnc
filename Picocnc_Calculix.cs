@@ -46,18 +46,18 @@ public static partial class Picocnc
     /// </summary>
     public static void RunCalculixAnalysis()
     {
-        Library.Log("\n============================================================");
-        Library.Log("===  CALCULIX FINITE ELEMENT ANALYSIS  ====================");
-        Library.Log("============================================================");
+        Log("\n============================================================");
+        Log("===  CALCULIX FINITE ELEMENT ANALYSIS  ====================");
+        Log("============================================================");
 
         if (!IsCalculixAvailable())
         {
-            Library.Log("CalculiX (ccx) not found on PATH.");
-            Library.Log("Install from http://www.calculix.de/ or place ccx.exe");
-            Library.Log("in the project output directory.");
-            Library.Log("");
-            Library.Log("===  CALCULIX ANALYSIS SKIPPED  ============================");
-            Library.Log("============================================================\n");
+            Log("CalculiX (ccx) not found on PATH.");
+            Log("Install from http://www.calculix.de/ or place ccx.exe");
+            Log("in the project output directory.");
+            Log("");
+            Log("===  CALCULIX ANALYSIS SKIPPED  ============================");
+            Log("============================================================\n");
             return;
         }
 
@@ -65,8 +65,8 @@ public static partial class Picocnc
         RunGantryAssemblyFrequency();
         CleanupCalculixFiles();
 
-        Library.Log("===  CALCULIX ANALYSIS COMPLETE  ===========================");
-        Library.Log("============================================================\n");
+        Log("===  CALCULIX ANALYSIS COMPLETE  ===========================");
+        Log("============================================================\n");
     }
 
     // =====================================================================
@@ -236,19 +236,19 @@ public static partial class Picocnc
         s_oCalcStaticResult = r;
 
         // --- Log ---
-        Library.Log("=== CalculiX GANTRY BRIDGE STATIC ===");
-        Library.Log($"  Nodes: {r.nNodes}, Elements: {r.nElements} (B31)");
+        Log("=== CalculiX GANTRY BRIDGE STATIC ===");
+        Log($"  Nodes: {r.nNodes}, Elements: {r.nElements} (B31)");
         if (r.bSuccess)
         {
-            Library.Log($"  Max deflection: {r.fMaxDeflectionMm:F3} mm");
-            Library.Log($"  Max stress: {r.fMaxStressMpa:F1} MPa");
-            Library.Log($"  Solve time: {r.fSolveTimeSec:F1} s");
+            Log($"  Max deflection: {r.fMaxDeflectionMm:F3} mm");
+            Log($"  Max stress: {r.fMaxStressMpa:F1} MPa");
+            Log($"  Solve time: {r.fSolveTimeSec:F1} s");
         }
         else
         {
-            Library.Log($"  FAILED: {r.strErrorMessage}");
+            Log($"  FAILED: {r.strErrorMessage}");
         }
-        Library.Log("");
+        Log("");
     }
 
     // =====================================================================
@@ -402,27 +402,27 @@ public static partial class Picocnc
         s_oCalcFreqResult = r;
 
         // --- Log ---
-        Library.Log("=== CalculiX GANTRY ASSEMBLY FREQUENCY ===");
-        Library.Log($"  Nodes: {r.nNodes}, Elements: {r.nElements} (B31)");
-        Library.Log("  Modes requested: 10");
+        Log("=== CalculiX GANTRY ASSEMBLY FREQUENCY ===");
+        Log($"  Nodes: {r.nNodes}, Elements: {r.nElements} (B31)");
+        Log("  Modes requested: 10");
         if (r.bSuccess && r.afFrequenciesHz != null)
         {
             for (int i = 0; i < r.afFrequenciesHz.Length; i++)
-                Library.Log($"  f{i + 1,2} = {r.afFrequenciesHz[i],8:F2} Hz");
+                Log($"  f{i + 1,2} = {r.afFrequenciesHz[i],8:F2} Hz");
 
             // Resonance check
             float fThresh = 30f;
             if (r.afFrequenciesHz.Length > 0 && r.afFrequenciesHz[0] < fThresh)
             {
-                Library.Log($"  WARNING: First mode ({r.afFrequenciesHz[0]:F1} Hz) below " +
+                Log($"  WARNING: First mode ({r.afFrequenciesHz[0]:F1} Hz) below " +
                     $"{fThresh} Hz — stepper resonance risk.");
             }
         }
         else
         {
-            Library.Log($"  FAILED: {r.strErrorMessage}");
+            Log($"  FAILED: {r.strErrorMessage}");
         }
-        Library.Log("");
+        Log("");
     }
 
     // =====================================================================
@@ -438,7 +438,7 @@ public static partial class Picocnc
 
         if (!File.Exists(strInpPath))
         {
-            Library.Log($"  ERROR: .inp file not found: {strInpPath}");
+            Log($"  ERROR: .inp file not found: {strInpPath}");
             return null;
         }
 
@@ -684,8 +684,8 @@ public static partial class Picocnc
             {
                 // Not necessarily a failure — just means we couldn't parse the .dat format
                 // This is common with different ccx versions. Report partial success.
-                Library.Log("  NOTE: Could not parse displacements/stresses from .dat file.");
-                Library.Log("  (Solver completed successfully — check .dat file manually.)");
+                Log("  NOTE: Could not parse displacements/stresses from .dat file.");
+                Log("  (Solver completed successfully — check .dat file manually.)");
             }
         }
         catch (Exception ex)

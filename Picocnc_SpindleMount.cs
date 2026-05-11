@@ -11,7 +11,7 @@ public static partial class Picocnc
     /// </summary>
     public static Voxels voxConstructSpindleMount()
     {
-        Library.Log("Building spindle mount...");
+        Log("Building spindle mount...");
 
         // --- Spindle body dimensions (local constants) ---
         float fSpindleBodyHeight    = 180f;  // typical 1.5-2.2kW spindle motor length
@@ -61,8 +61,9 @@ public static partial class Picocnc
         voxClampRing.BoolSubtract(voxSlit);
 
         // --- Mounting flange: plate connecting clamp to Z carriage ---
+        // Reduced Y from 20mm to 12mm to clear Z lead screw
         float fFlangeX = fZPlateX;
-        float fFlangeY = 20f;
+        float fFlangeY = 12f;
         float fFlangeZ = 80f;
 
         Vector3 vecFlangeCenter = new(
@@ -172,7 +173,7 @@ public static partial class Picocnc
         voxResult += voxTopCap;
         voxResult += voxCable;
 
-        Library.Log("Spindle mount done: clamp + body + collet + tool + cooling jacket + top cap.");
+        Log("Spindle mount done: clamp + body + collet + tool + cooling jacket + top cap.");
         return voxResult;
     }
 }

@@ -10,7 +10,7 @@ public static partial class Picocnc
     /// </summary>
     public static Voxels voxConstructGantryBridge()
     {
-        Library.Log("Building gantry bridge...");
+        Log("Building gantry bridge...");
 
         float fLeftX  = fRailInsetX;
         float fRightX = fBaseOuterX - fRailInsetX;
@@ -92,7 +92,7 @@ public static partial class Picocnc
         voxResult += voxBossLeft;
         voxResult += voxBossRight;
 
-        Library.Log("Gantry bridge done.");
+        Log("Gantry bridge done.");
         return voxResult;
     }
 }

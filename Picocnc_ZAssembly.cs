@@ -10,7 +10,7 @@ public static partial class Picocnc
     /// </summary>
     public static Voxels voxConstructZAssembly()
     {
-        Library.Log("Building Z-axis assembly...");
+        Log("Building Z-axis assembly...");
 
         float fMidY = fBaseOuterY / 2f;
         float fBridgeMidX = fBaseOuterX / 2f;
@@ -79,7 +79,7 @@ public static partial class Picocnc
         voxResult += voxZRails;
         voxResult += voxCarriage;
 
-        Library.Log("Z-axis assembly done.");
+        Log("Z-axis assembly done.");
         return voxResult;
     }
 }

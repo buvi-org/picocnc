@@ -1,4 +1,5 @@
 using System.Numerics;
+using System.Collections.Generic;
 
 namespace PicoGK;
 
@@ -21,13 +22,20 @@ public static partial class Picocnc
     /// =====================================================================
 
     /// <summary>
+    /// Public result fields — populated during VerifyCollisions()
+    /// </summary>
+    public static int s_nOverlappingPairs;
+    public static int s_nUnexpectedWarnings;
+    public static List<string>? s_aCollisionDetails;
+
+    /// <summary>
     /// Master entry point.  Call this after voxConstruct() completes.
     /// </summary>
     public static void VerifyCollisions()
     {
-        Library.Log("\n============================================================");
-        Library.Log("===  COLLISION VERIFICATION  ===============================");
-        Library.Log("============================================================");
+        Log("\n============================================================");
+        Log("===  COLLISION VERIFICATION  ===============================");
+        Log("============================================================");
 
         // --- Build all 12 components as separate voxel fields ---
         System.Collections.Generic.Dictionary<string, Voxels> map = BuildAllComponents();
@@ -41,8 +49,8 @@ public static partial class Picocnc
         CheckSpindleCarriageInterface(map);
         CheckXRailBearingToZPlate(map);
 
-        Library.Log("\n===  VERIFICATION COMPLETE  ================================");
-        Library.Log("============================================================\n");
+        Log("\n===  VERIFICATION COMPLETE  ================================");
+        Log("============================================================\n");
     }
 
     // =====================================================================
@@ -53,43 +61,43 @@ public static partial class Picocnc
     {
         var map = new System.Collections.Generic.Dictionary<string, Voxels>();
 
-        Library.Log("Building BaseFrame for verification...");
+        Log("Building BaseFrame for verification...");
         map["BaseFrame"] = voxConstructBaseFrame();
 
-        Library.Log("Building WorkBed for verification...");
+        Log("Building WorkBed for verification...");
         map["WorkBed"] = voxConstructWorkBed();
 
-        Library.Log("Building YRails for verification...");
+        Log("Building YRails for verification...");
         map["YRails"] = voxConstructYRails();
 
-        Library.Log("Building GantryUprights for verification...");
+        Log("Building GantryUprights for verification...");
         map["GantryUprights"] = voxConstructUprights();
 
-        Library.Log("Building GantryBridge for verification...");
+        Log("Building GantryBridge for verification...");
         map["GantryBridge"] = voxConstructGantryBridge();
 
-        Library.Log("Building XRails for verification...");
+        Log("Building XRails for verification...");
         map["XRails"] = voxConstructXRails();
 
-        Library.Log("Building ZAssembly for verification...");
+        Log("Building ZAssembly for verification...");
         map["ZAssembly"] = voxConstructZAssembly();
 
-        Library.Log("Building SpindleMount for verification...");
+        Log("Building SpindleMount for verification...");
         map["SpindleMount"] = voxConstructSpindleMount();
 
-        Library.Log("Building MotorMounts for verification...");
+        Log("Building MotorMounts for verification...");
         map["MotorMounts"] = voxConstructMotorMounts();
 
-        Library.Log("Building LeadScrews for verification...");
+        Log("Building LeadScrews for verification...");
         map["LeadScrews"] = voxConstructLeadScrews();
 
-        Library.Log("Building DragChains for verification...");
+        Log("Building DragChains for verification...");
         map["DragChains"] = voxConstructDragChains();
 
-        Library.Log("Building Safety for verification...");
+        Log("Building Safety for verification...");
         map["Safety"] = voxConstructSafety();
 
-        Library.Log($"All 12 components built ({map.Count} total).");
+        Log($"All 12 components built ({map.Count} total).");
         return map;
     }
 
@@ -119,14 +127,18 @@ public static partial class Picocnc
         // X rails on bridge front face
         ("GantryBridge", "XRails"),
 
-        // Z assembly mounts on X bearing blocks
+        // Z assembly mounts on X bearing blocks in front of bridge
         ("XRails", "ZAssembly"),
+
+        // Z back plate is coplanar with bridge front face (expected interface)
+        ("GantryBridge", "ZAssembly"),
 
         // Spindle mount attaches to Z carriage
         ("SpindleMount", "ZAssembly"),
 
         // Motors mounted at various positions
         ("MotorMounts", "BaseFrame"),       // Y motor at base rear
+        ("MotorMounts", "WorkBed"),         // Y motor plate near table rear edge
         ("MotorMounts", "GantryBridge"),    // X motor on bridge end
         ("MotorMounts", "ZAssembly"),       // Z motor on Z plate
 
@@ -151,11 +163,12 @@ public static partial class Picocnc
         map.Keys.CopyTo(keys, 0);
 
         int nTotalPairs = keys.Length * (keys.Length - 1) / 2;
-        Library.Log($"\n--- Pairwise Overlap Check " +
+        Log($"\n--- Pairwise Overlap Check " +
             $"({keys.Length} components, {nTotalPairs} pairs) ---");
 
         int nOverlapping = 0;
         int nUnexpected = 0;
+        var aDetails = new List<string>();
 
         for (int i = 0; i < keys.Length; i++)
         {
@@ -177,17 +190,22 @@ public static partial class Picocnc
                                   || s_expectedOverlaps.Contains((b, a));
 
                     string strTag = bExpected ? "[EXPECTED]" : "[WARNING]";
-                    Library.Log(
-                        $"  {strTag} {a} & {b}  " +
-                        $"{nTri} tris overlap");
+                    string strDetail = $"{strTag} {a} & {b}  {nTri} tris overlap";
+                    Log($"  {strDetail}");
 
+                    aDetails.Add(strDetail);
                     nOverlapping++;
                     if (!bExpected) nUnexpected++;
                 }
             }
         }
 
-        Library.Log($"  Result: {nOverlapping} overlapping pairs " +
+        // Store results for web API
+        s_nOverlappingPairs   = nOverlapping;
+        s_nUnexpectedWarnings = nUnexpected;
+        s_aCollisionDetails   = aDetails;
+
+        Log($"  Result: {nOverlapping} overlapping pairs " +
             $"({nUnexpected} unexpected)");
     }
 
@@ -204,12 +222,12 @@ public static partial class Picocnc
     static void CheckZPlateBridgeInterface(
         System.Collections.Generic.Dictionary<string, Voxels> map)
     {
-        Library.Log("\n--- Targeted: Z-Plate / Bridge Interface ---");
+        Log("\n--- Targeted: Z-Plate / Bridge Interface ---");
 
         if (!map.TryGetValue("ZAssembly", out Voxels? voxZa)
          || !map.TryGetValue("GantryBridge", out Voxels? voxBridge))
         {
-            Library.Log("  Components missing -- skipping.");
+            Log("  Components missing -- skipping.");
             return;
         }
 
@@ -219,19 +237,19 @@ public static partial class Picocnc
 
         float fBridgeYFront = fBaseOuterY / 2f - fGantryBridgeY / 2f;
 
-        Library.Log($"  Bridge front face Y = {fBridgeYFront:F1}");
-        Library.Log($"  Z-plate front face Y = {fZPlateFrontY:F1}  " +
+        Log($"  Bridge front face Y = {fBridgeYFront:F1}");
+        Log($"  Z-plate front face Y = {fZPlateFrontY:F1}  " +
             $"(Constraints: fZPlateFrontY)");
-        Library.Log($"  Gap/overlap: {(fZPlateFrontY - fBridgeYFront):F1} mm  " +
+        Log($"  Gap/overlap: {(fZPlateFrontY - fBridgeYFront):F1} mm  " +
             $"(positive = plate in front of bridge)");
 
         if (nTri > 0)
         {
-            Library.Log($"  Voxel overlap with bridge: {nTri} tris");
+            Log($"  Voxel overlap with bridge: {nTri} tris");
         }
         else
         {
-            Library.Log("  No voxel overlap -- Z plate is clear of bridge. OK.");
+            Log("  No voxel overlap -- Z plate is clear of bridge. OK.");
         }
     }
 
@@ -246,7 +264,7 @@ public static partial class Picocnc
     static void CheckToolTipClearance(
         System.Collections.Generic.Dictionary<string, Voxels> map)
     {
-        Library.Log("\n--- Targeted: Tool Tip Clearance ---");
+        Log("\n--- Targeted: Tool Tip Clearance ---");
 
         float fBridgeZ = fBaseOuterZ + fRailHeight + fUprightZ + fGantryBridgeZ / 2f;
         float fClampZ = fBridgeZ - 30f;               // from SpindleMount constructor
@@ -256,10 +274,10 @@ public static partial class Picocnc
 
         float fClearance = fToolTipZ - fSpoilTopZ;
 
-        Library.Log($"  Spindle clamp center Z = {fClampZ:F1}");
-        Library.Log($"  Tool tip Z              = {fToolTipZ:F1}");
-        Library.Log($"  Spoil board top Z       = {fSpoilTopZ:F1}");
-        Library.Log($"  Clearance               = {fClearance:F1} mm " +
+        Log($"  Spindle clamp center Z = {fClampZ:F1}");
+        Log($"  Tool tip Z              = {fToolTipZ:F1}");
+        Log($"  Spoil board top Z       = {fSpoilTopZ:F1}");
+        Log($"  Clearance               = {fClearance:F1} mm " +
             $"({(fClearance > 0 ? "tool above spoil board" : "TOOL BELOW BOARD -- COLLISION!")})");
 
         // Also voxel-level check
@@ -271,13 +289,13 @@ public static partial class Picocnc
 
             if (nTri > 0)
             {
-                Library.Log(
+                Log(
                     $"  VOXEL WARNING: Spindle overlaps WorkBed " +
                     $"({nTri} tris)");
             }
             else
             {
-                Library.Log("  Voxel check: No spindle/workbed overlap. OK.");
+                Log("  Voxel check: No spindle/workbed overlap. OK.");
             }
         }
     }
@@ -289,12 +307,12 @@ public static partial class Picocnc
     static void CheckSpindleCarriageInterface(
         System.Collections.Generic.Dictionary<string, Voxels> map)
     {
-        Library.Log("\n--- Targeted: Spindle / Z-Carriage Interface ---");
+        Log("\n--- Targeted: Spindle / Z-Carriage Interface ---");
 
         if (!map.TryGetValue("SpindleMount", out Voxels? voxSpindle)
          || !map.TryGetValue("ZAssembly", out Voxels? voxZAssembly))
         {
-            Library.Log("  Components missing -- skipping.");
+            Log("  Components missing -- skipping.");
             return;
         }
 
@@ -319,21 +337,21 @@ public static partial class Picocnc
 
         float fGap = fCarriageFrontY - fFlangeFrontY;
 
-        Library.Log($"  Carriage front Y = {fCarriageFrontY:F1}");
-        Library.Log($"  Flange front Y   = {fFlangeFrontY:F1}");
+        Log($"  Carriage front Y = {fCarriageFrontY:F1}");
+        Log($"  Flange front Y   = {fFlangeFrontY:F1}");
 
         if (nTri > 0)
         {
-            Library.Log(
+            Log(
                 $"  Overlap: {nTri} tris -- " +
                 $"spindle flange connected to Z carriage. OK.");
         }
         else
         {
-            Library.Log(
+            Log(
                 $"  WARNING: No voxel overlap -- spindle may be " +
                 $"detached from Z carriage!");
-            Library.Log($"    Design flange front to carriage front " +
+            Log($"    Design flange front to carriage front " +
                 $"gap: {fGap:F1} mm");
         }
     }
@@ -346,7 +364,7 @@ public static partial class Picocnc
     static void CheckXRailBearingToZPlate(
         System.Collections.Generic.Dictionary<string, Voxels> map)
     {
-        Library.Log("\n--- Targeted: X-Rail Bearings / Z-Plate ---");
+        Log("\n--- Targeted: X-Rail Bearings / Z-Plate ---");
 
         float fBridgeYFront = fBaseOuterY / 2f - fGantryBridgeY / 2f;
         float fBridgeZ = fBaseOuterZ + fRailHeight + fUprightZ + fGantryBridgeZ / 2f;
@@ -361,9 +379,9 @@ public static partial class Picocnc
 
         float fGap = fZPlateBackY - fBearFrontY;
 
-        Library.Log($"  X bearing front face Y = {fBearFrontY:F1}");
-        Library.Log($"  Z plate back face Y    = {fZPlateBackY:F1}");
-        Library.Log($"  Gap                    = {fGap:F1} mm " +
+        Log($"  X bearing front face Y = {fBearFrontY:F1}");
+        Log($"  Z plate back face Y    = {fZPlateBackY:F1}");
+        Log($"  Gap                    = {fGap:F1} mm " +
             $"({(fGap >= -1 ? "bearing touches plate" : "bearing extends past plate back")})");
 
         // The Z plate is 80mm wide (X), centered at bridge mid.
@@ -372,9 +390,9 @@ public static partial class Picocnc
         // X rails are at fBridgeZ +/- (40 - 15) = fBridgeZ +/- 25.
         // So both X rails are well within the Z plate's Z range.
         float fZPlateHalfZ = fZPlateZ / 2f;
-        Library.Log($"  Z plate Z range: [{fBridgeZ - fZPlateHalfZ:F1}, " +
+        Log($"  Z plate Z range: [{fBridgeZ - fZPlateHalfZ:F1}, " +
             $"{fBridgeZ + fZPlateHalfZ:F1}] (span={fZPlateZ:F1})");
-        Library.Log($"  X rails Z positions: {fXRailUpperZ:F1} (upper), " +
+        Log($"  X rails Z positions: {fXRailUpperZ:F1} (upper), " +
             $"{fXRailLowerZ:F1} (lower)");
     }
 }

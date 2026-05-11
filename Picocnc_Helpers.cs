@@ -5,6 +5,22 @@ namespace PicoGK;
 public static partial class Picocnc
 {
     /// <summary>
+    /// Safe logger — uses Log() in viewer mode, Console.WriteLine in headless.
+    /// </summary>
+    public static void Log(string strFormat, params object[] args)
+    {
+        try
+        {
+            Library.Log(strFormat, args);
+        }
+        catch
+        {
+            string str = args.Length > 0 ? string.Format(strFormat, args) : strFormat;
+            Console.WriteLine(str);
+        }
+    }
+
+    /// <summary>
     /// Creates a box-shaped Voxels object centered at vecCenter with the given size.
     /// </summary>
     public static Voxels voxBox(Vector3 vecSize, Vector3 vecCenter)
@@ -118,6 +134,6 @@ public static partial class Picocnc
             Utils.strDocumentsFolder(),
             $"PicoCNC_{strName}.stl");
         vox.mshAsMesh().SaveToStlFile(strPath);
-        Library.Log($"Exported: {strPath}");
+        Log($"Exported: {strPath}");
     }
 }

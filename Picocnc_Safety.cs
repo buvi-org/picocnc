@@ -263,7 +263,7 @@ public static partial class Picocnc
     // =========================================================================
     public static Voxels voxConstructSafety()
     {
-        Library.Log("Building safety components...");
+        Log("Building safety components...");
 
         Voxels voxSafety = new();
 
@@ -400,7 +400,7 @@ public static partial class Picocnc
             new Vector3(fBaseOuterX / 2f, 0f, fBaseOuterZ * 0.7f),
             -vY);   // button extends forward (-Y) from front face
 
-        Library.Log("Safety components done — 6 limit switches, 6 end stops, 1 E-stop.");
+        Log("Safety components done — 6 limit switches, 6 end stops, 1 E-stop.");
         return voxSafety;
     }
 }

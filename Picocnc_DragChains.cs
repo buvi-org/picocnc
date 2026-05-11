@@ -17,7 +17,7 @@ public static partial class Picocnc
     /// </summary>
     public static Voxels voxConstructDragChains()
     {
-        Library.Log("Building drag chain mounts...");
+        Log("Building drag chain mounts...");
 
         float fMidY         = fBaseOuterY / 2f;
         float fBridgeMidX   = fBaseOuterX / 2f;
@@ -28,7 +28,7 @@ public static partial class Picocnc
         // =====================================================================
         // ORIGINAL: Y-axis cable tray — U-channel along the base right edge
         // =====================================================================
-        float fTrayX       = fBaseOuterX - fRailInsetX + fRailWidth + 20f;
+        float fTrayX       = fYTrayX; // uses constraint: base edge + rail + offset
         float fTrayZ       = fBaseOuterZ + 10f;
         float fTrayY       = fBaseOuterY - 80f;
         float fTrayMidY    = fBaseOuterY / 2f;
@@ -58,7 +58,6 @@ public static partial class Picocnc
         // =====================================================================
         float fXTrayX     = (fBaseOuterX - fRailInsetX) - fRailInsetX - fUprightX;
         float fXTrayMidX  = fBridgeMidX;
-        float fXTrayY     = fMidY - fGantryBridgeY / 2f - fChainWidth;
         float fXTrayZ     = fBridgeZ + fGantryBridgeZ / 2f + 5f;
 
         Voxels voxXTrayFloor = voxBox(
@@ -108,7 +107,7 @@ public static partial class Picocnc
             int    nLinks   = (int)MathF.Floor(fTrayY / fLinkPitch);
             float  fYStart  = fTrayMidY - fTrayY / 2f + fHalfLink;
 
-            Library.Log($"  Y-axis chain: {nLinks} links");
+            Log($"  Y-axis chain: {nLinks} links");
 
             for (int i = 0; i < nLinks; i++)
             {
@@ -175,7 +174,7 @@ public static partial class Picocnc
             int   nLinks   = (int)MathF.Floor(fXTrayX / fLinkPitch);
             float fXStart  = fXTrayMidX - fXTrayX / 2f + fHalfLink;
 
-            Library.Log($"  X-axis chain: {nLinks} links");
+            Log($"  X-axis chain: {nLinks} links");
 
             for (int i = 0; i < nLinks; i++)
             {
@@ -392,7 +391,7 @@ public static partial class Picocnc
             }
         }
 
-        Library.Log("Drag chain mounts done.");
+        Log("Drag chain mounts done.");
         return voxAllChains;
     }
 }

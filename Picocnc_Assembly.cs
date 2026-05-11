@@ -13,62 +13,62 @@ public static partial class Picocnc
         // 1. Base Frame — foundation
         Voxels vox = voxConstructBaseFrame();
         voxMachine += vox;
-        Library.oViewer().Add(vox, 1);
+        if (bHasViewer()) Library.oViewer().Add(vox, 1);
 
         // 2. Work Bed — table slab with T-slots
         vox = voxConstructWorkBed();
         voxMachine += vox;
-        Library.oViewer().Add(vox, 2);
+        if (bHasViewer()) Library.oViewer().Add(vox, 2);
 
         // 3. Y-Axis Rails — linear rails on base sides
         vox = voxConstructYRails();
         voxMachine += vox;
-        Library.oViewer().Add(vox, 3);
+        if (bHasViewer()) Library.oViewer().Add(vox, 3);
 
         // 4. Gantry Uprights — vertical columns
         vox = voxConstructUprights();
         voxMachine += vox;
-        Library.oViewer().Add(vox, 4);
+        if (bHasViewer()) Library.oViewer().Add(vox, 4);
 
         // 5. Gantry Bridge — hollow box beam with internal ribs
         vox = voxConstructGantryBridge();
         voxMachine += vox;
-        Library.oViewer().Add(vox, 5);
+        if (bHasViewer()) Library.oViewer().Add(vox, 5);
 
         // 6. X-Axis Rails — linear rails on gantry face
         vox = voxConstructXRails();
         voxMachine += vox;
-        Library.oViewer().Add(vox, 6);
+        if (bHasViewer()) Library.oViewer().Add(vox, 6);
 
         // 7. Z-Axis Assembly — back plate + Z rails + carriage
         vox = voxConstructZAssembly();
         voxMachine += vox;
-        Library.oViewer().Add(vox, 7);
+        if (bHasViewer()) Library.oViewer().Add(vox, 7);
 
         // 8. Spindle Mount — clamp ring + flange
         vox = voxConstructSpindleMount();
         voxMachine += vox;
-        Library.oViewer().Add(vox, 8);
+        if (bHasViewer()) Library.oViewer().Add(vox, 8);
 
         // 9. Motor Mounts — NEMA 23 plates (X, Y, Z)
         vox = voxConstructMotorMounts();
         voxMachine += vox;
-        Library.oViewer().Add(vox, 9);
+        if (bHasViewer()) Library.oViewer().Add(vox, 9);
 
         // 10. Lead Screws — T12 drive rods (X, Y, Z)
         vox = voxConstructLeadScrews();
         voxMachine += vox;
-        Library.oViewer().Add(vox, 10);
+        if (bHasViewer()) Library.oViewer().Add(vox, 10);
 
         // 11. Drag Chain Mounts — cable management
         vox = voxConstructDragChains();
         voxMachine += vox;
-        Library.oViewer().Add(vox, 11);
+        if (bHasViewer()) Library.oViewer().Add(vox, 11);
 
         // 12. Safety — limit switches, end stops, E-stop
         vox = voxConstructSafety();
         voxMachine += vox;
-        Library.oViewer().Add(vox, 12);
+        if (bHasViewer()) Library.oViewer().Add(vox, 12);
 
         return voxMachine;
     }
@@ -79,7 +79,7 @@ public static partial class Picocnc
     /// </summary>
     public static void ExportAllComponents()
     {
-        Library.Log("Exporting individual components...");
+        Log("Exporting individual components...");
 
         ExportStl(voxConstructBaseFrame(), "BaseFrame");
         ExportStl(voxConstructWorkBed(), "WorkBed");
@@ -94,6 +94,6 @@ public static partial class Picocnc
         ExportStl(voxConstructDragChains(), "DragChains");
         ExportStl(voxConstructSafety(), "Safety");
 
-        Library.Log("Component export complete.");
+        Log("Component export complete.");
     }
 }

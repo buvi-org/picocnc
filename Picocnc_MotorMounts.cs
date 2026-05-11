@@ -11,7 +11,7 @@ public static partial class Picocnc
     /// </summary>
     public static Voxels voxConstructMotorMounts()
     {
-        Library.Log("Building motor mounts...");
+        Log("Building motor mounts...");
 
         float fMidY = fBaseOuterY / 2f;
         float fBridgeMidX = fBaseOuterX / 2f;
@@ -20,15 +20,17 @@ public static partial class Picocnc
         Voxels voxAllMotors = new();
 
         // --- Y-axis motor: at the back end of the base, centered ---
-        Vector3 vecYMotor = new(fBridgeMidX, fBaseOuterY - 30f, fBaseOuterZ + fRailHeight + fNema23Width / 2f);
+        Vector3 vecYMotor = new(fBridgeMidX, fYMotorY, fBaseOuterZ + fRailHeight + fNema23Width / 2f);
         voxAllMotors += voxConstructNema23Plate(vecYMotor, new Vector3(0, 1, 0));
         voxAllMotors += voxBuildMotorBody(vecYMotor, new Vector3(0, 1, 0), fMountPlateThick);
 
         // --- X-axis motor: at one end of the gantry bridge ---
+        // Positioned behind the bridge face to clear X rails (Y=[212.5,248])
+        // and X-axis limit switches (Y=[200,220]).
         float fBridgeYFront = fMidY - fGantryBridgeY / 2f;
         Vector3 vecXMotoR = new(
-            fRailInsetX + fUprightX + 30f,
-            fBridgeYFront + fNema23Width / 2f,
+            fXMotorX,
+            fBridgeYFront + fNema23Width / 2f + 30f,
             fBridgeZ);
         voxAllMotors += voxConstructNema23Plate(vecXMotoR, new Vector3(0, -1, 0));
         voxAllMotors += voxBuildMotorBody(vecXMotoR, new Vector3(-1, 0, 0), fMountPlateThick);
@@ -42,7 +44,7 @@ public static partial class Picocnc
         voxAllMotors += voxConstructNema23Plate(vecZMotoR, new Vector3(0, -1, 0));
         voxAllMotors += voxBuildMotorBody(vecZMotoR, new Vector3(0, 1, 0), fMountPlateThick);
 
-        Library.Log("Motor mounts done.");
+        Log("Motor mounts done.");
         return voxAllMotors;
     }
 

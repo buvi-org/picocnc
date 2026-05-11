@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PicoCNC Maker</title>
+    <link rel="stylesheet" href="/css/maker.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='14' font-size='14'>⚙</text></svg>">
+</head>
+<body>
+    <div id="app">
+        <!-- ═══ Left Panel: Parameters ═══ -->
+        <div id="config-panel">
+            <h1>PicoCNC Maker</h1>
+            <p class="muted">Loading configuration...</p>
+        </div>
+
+        <!-- ═══ Center Panel: 3D Viewer ═══ -->
+        <div id="viewer-container">
+            <canvas id="viewer"></canvas>
+        </div>
+
+        <!-- ═══ Right Panel: Components, BOM, Analysis ═══ -->
+        <div id="info-panel">
+            <div id="component-toggles"></div>
+            <div id="bom">
+                <h3>Bill of Materials</h3>
+                <p class="muted">No data — build to generate</p>
+            </div>
+            <div id="analysis">
+                <h3>Analysis</h3>
+                <p class="muted">No data — build to generate</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Three.js import map — loads from CDN, no local files needed ── -->
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.170.0/build/three.module.min.js",
+            "three/addons/": "https://unpkg.com/three@0.170.0/examples/jsm/"
+        }
+    }
+    </script>
+
+    <!-- ── Main application entry point ── -->
+    <script type="module" src="/js/maker.js"></script>
+</body>
+</html>

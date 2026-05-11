@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="Picocnc.csproj" />
+  <Project Path="Picocnc.Web/Picocnc.Web.csproj" />
+</Solution>

@@ -1612,9 +1612,9 @@ public static partial class Picocnc
     /// </summary>
     public static void PrintPartsList(CNCSelectedParts parts)
     {
-        Library.Log("================================================================");
-        Library.Log("  PicoCNC — BILL OF MATERIALS (COTS Parts)");
-        Library.Log("================================================================");
+        Log("================================================================");
+        Log("  PicoCNC — BILL OF MATERIALS (COTS Parts)");
+        Log("================================================================");
 
         PrintPart("Y-AXIS GUIDEWAY (×2)", parts.oYGuideway);
         PrintPart("X-AXIS GUIDEWAY (×2)", parts.oXGuideway);
@@ -1634,16 +1634,16 @@ public static partial class Picocnc
         PrintPart("LIMIT SWITCHES",       parts.oLimitSwitch);
         PrintPart("STRUCTURAL FASTENERS", parts.oFastenerMain);
 
-        Library.Log("================================================================");
+        Log("================================================================");
 
         // Summary of key specs
-        Library.Log($"Guideway load rating: {parts.oYGuideway.fDynamicLoad / 1000f:F1} kN dynamic");
-        Library.Log($"Y stepper torque:     {parts.oYStepper.fHoldingTorque:F2} Nm");
-        Library.Log($"Spindle power:        {parts.oSpindle.fRatedPower:F1} kW, " +
+        Log($"Guideway load rating: {parts.oYGuideway.fDynamicLoad / 1000f:F1} kN dynamic");
+        Log($"Y stepper torque:     {parts.oYStepper.fHoldingTorque:F2} Nm");
+        Log($"Spindle power:        {parts.oSpindle.fRatedPower:F1} kW, " +
                      $"{parts.oSpindle.fRatedSpeed:F0} RPM, " +
                      $"ER{parts.oSpindle.fColletType:F0} collet");
-        Library.Log($"Budget tier:          {parts.oYGuideway.eBudget}");
-        Library.Log("================================================================");
+        Log($"Budget tier:          {parts.oYGuideway.eBudget}");
+        Log("================================================================");
     }
 
     /// <summary>
@@ -1653,65 +1653,65 @@ public static partial class Picocnc
     {
         if (string.IsNullOrEmpty(o.strPartNumber))
         {
-            Library.Log($"  {strLabel}: (not selected)");
+            Log($"  {strLabel}: (not selected)");
             return;
         }
 
-        Library.Log($"  {strLabel}:");
-        Library.Log($"    {o.strManufacturer} {o.strPartNumber} — {o.strDescription}");
+        Log($"  {strLabel}:");
+        Log($"    {o.strManufacturer} {o.strPartNumber} — {o.strDescription}");
 
         // Print relevant specs based on category
         switch (o.eCategory)
         {
             case PartCategory.LinearGuide:
-                Library.Log($"    Rail: {o.fWidth:F0}x{o.fHeight:F0}mm, " +
+                Log($"    Rail: {o.fWidth:F0}x{o.fHeight:F0}mm, " +
                              $"Block: {o.fBlockWidth:F0}x{o.fBlockLength:F0}x{o.fBlockHeight:F0}mm");
-                Library.Log($"    Bolt: M{o.fBoltDiameter:F0} @ {o.fBoltSpacing:F0}mm spacing, " +
+                Log($"    Bolt: M{o.fBoltDiameter:F0} @ {o.fBoltSpacing:F0}mm spacing, " +
                              $"Dyn Load: {o.fDynamicLoad / 1000f:F1} kN");
                 break;
 
             case PartCategory.BallScrew:
             case PartCategory.LeadScrew:
-                Library.Log($"    OD: {o.fWidth:F0}mm, Lead: {o.fHeight:F0}mm, " +
+                Log($"    OD: {o.fWidth:F0}mm, Lead: {o.fHeight:F0}mm, " +
                              $"Nut: {o.fBlockWidth:F0}x{o.fBlockHeight:F0}mm");
-                Library.Log($"    Accuracy: {o.fAccuracy:F3} mm/300mm, " +
+                Log($"    Accuracy: {o.fAccuracy:F3} mm/300mm, " +
                              $"Shaft end: {o.fShaftDiameter:F0}mm");
                 break;
 
             case PartCategory.StepperMotor:
-                Library.Log($"    NEMA {o.fNemaSize:F0}, {o.fHoldingTorque:F2} Nm, " +
+                Log($"    NEMA {o.fNemaSize:F0}, {o.fHoldingTorque:F2} Nm, " +
                              $"Body: {o.fMotorBodyLength:F0}mm, " +
                              $"Shaft: {o.fShaftDiameter:F2}mm");
-                Library.Log($"    Mounting: M{o.fBoltDiameter:F0} bolts, " +
+                Log($"    Mounting: M{o.fBoltDiameter:F0} bolts, " +
                              $"Face: {o.fWidth:F1}mm");
                 break;
 
             case PartCategory.SpindleMotor:
-                Library.Log($"    {o.fRatedPower:F1} kW, {o.fRatedSpeed:F0} RPM, " +
+                Log($"    {o.fRatedPower:F1} kW, {o.fRatedSpeed:F0} RPM, " +
                              $"OD: {o.fSpindleOD:F0}mm, " +
                              $"ER{o.fColletType:F0} collet");
-                Library.Log($"    Body: {o.fLength:F0}mm long, " +
+                Log($"    Body: {o.fLength:F0}mm long, " +
                              $"Max tool: {o.fMaxToolDiameter:F0}mm, " +
                              $"Weight: {o.fWeight:F1} kg");
                 break;
 
             case PartCategory.Coupling:
-                Library.Log($"    OD: {o.fWidth:F0}mm, Length: {o.fLength:F0}mm, " +
+                Log($"    OD: {o.fWidth:F0}mm, Length: {o.fLength:F0}mm, " +
                              $"Bores: {o.fShaftDiameter:F2}mm / {o.fHeight:F0}mm");
                 break;
 
             case PartCategory.DragChain:
-                Library.Log($"    Inner: {o.fBlockWidth:F0}x{o.fBlockHeight:F0}mm, " +
+                Log($"    Inner: {o.fBlockWidth:F0}x{o.fBlockHeight:F0}mm, " +
                              $"Outer: {o.fWidth:F0}x{o.fHeight:F0}mm, " +
                              $"Bend R: {o.fLength:F0}mm");
                 break;
 
             case PartCategory.LimitSwitch:
-                Library.Log($"    {o.strDescription}");
+                Log($"    {o.strDescription}");
                 break;
 
             case PartCategory.Fastener:
-                Library.Log($"    {o.strPartNumber} — {o.strDescription}");
+                Log($"    {o.strPartNumber} — {o.strDescription}");
                 break;
         }
     }

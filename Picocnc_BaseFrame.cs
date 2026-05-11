@@ -6,7 +6,7 @@ public static partial class Picocnc
 {
     public static Voxels voxConstructBaseFrame()
     {
-        Library.Log("Building base frame...");
+        Log("Building base frame...");
 
         // --- Outer shell ---
         Voxels voxOuter = voxBox(
@@ -116,7 +116,7 @@ public static partial class Picocnc
         voxResult.BoolAdd(voxRibsX);
         voxResult.BoolAdd(voxFeet);
 
-        Library.Log("Base frame done.");
+        Log("Base frame done.");
         return voxResult;
     }
 }

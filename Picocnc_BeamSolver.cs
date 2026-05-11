@@ -35,6 +35,17 @@ public static partial class Picocnc
     public const float fSafetyFactor      = 3.0f;   // engineering safety factor
 
     // =====================================================================
+    // PUBLIC RESULT FIELDS — populated during RunBeamAnalysis()
+    // =====================================================================
+
+    public static float s_fBridgeDeflectionMm;
+    public static float s_fBridgeSafetyFactor;
+    public static float s_fLeadScrewBucklingSafety;
+    public static float s_fUprightBucklingSafety;
+    public static float s_fUprightSlenderness;
+    public static float s_fBaseRibBucklingSafety;
+
+    // =====================================================================
     // MASTER ENTRY POINT
     // =====================================================================
 
@@ -44,15 +55,15 @@ public static partial class Picocnc
     /// </summary>
     public static void RunBeamAnalysis()
     {
-        Library.Log("\n============================================================");
-        Library.Log("===  BEAM STRUCTURAL ANALYSIS  =============================");
-        Library.Log("============================================================");
+        Log("\n============================================================");
+        Log("===  BEAM STRUCTURAL ANALYSIS  =============================");
+        Log("============================================================");
 
-        Library.Log($"  Material: Aluminum 6061-T6  (E={fYoungsModulusAluminum} MPa, " +
+        Log($"  Material: Aluminum 6061-T6  (E={fYoungsModulusAluminum} MPa, " +
             $"yield={fYieldStrengthAluminum} MPa)");
-        Library.Log($"  Loads: XY force={fCuttingForceXY}N, Z force={fCuttingForceZ}N, " +
+        Log($"  Loads: XY force={fCuttingForceXY}N, Z force={fCuttingForceZ}N, " +
             $"safety factor={fSafetyFactor:F1}x");
-        Library.Log("");
+        Log("");
 
         AnalyzeGantryBridge();
         AnalyzeBaseFrame();
@@ -65,8 +76,8 @@ public static partial class Picocnc
         // --- CalculiX batch FEA (external subprocess) ---
         RunCalculixAnalysis();
 
-        Library.Log("\n===  BEAM ANALYSIS COMPLETE  ===============================");
-        Library.Log("============================================================\n");
+        Log("\n===  BEAM ANALYSIS COMPLETE  ===============================");
+        Log("============================================================\n");
     }
 
     // =====================================================================
@@ -98,33 +109,37 @@ public static partial class Picocnc
         float E = fYoungsModulusAluminum;
         float deflection = (F * fSpan * fSpan * fSpan) / (48f * E * I);
 
-        Library.Log("=== GANTRY BRIDGE ANALYSIS ===");
-        Library.Log($"  Span: {fSpan:F0} mm, Section: {b:F0}x{h:F0}mm, Wall: {t:F0}mm");
-        Library.Log($"  I = {I / 1e6f:F2} × 10⁶ mm⁴");
-        Library.Log($"  Deflection at {F:F0}N center load: {deflection:F3} mm");
-        Library.Log($"  L/δ = {fSpan / deflection:F0} (target > 500 for CNC rigidity)");
+        Log("=== GANTRY BRIDGE ANALYSIS ===");
+        Log($"  Span: {fSpan:F0} mm, Section: {b:F0}x{h:F0}mm, Wall: {t:F0}mm");
+        Log($"  I = {I / 1e6f:F2} × 10⁶ mm⁴");
+        Log($"  Deflection at {F:F0}N center load: {deflection:F3} mm");
+        Log($"  L/δ = {fSpan / deflection:F0} (target > 500 for CNC rigidity)");
 
         // Stress check
         float stress = (F * fSpan * h) / (8f * I);
         float stressSafety = fYieldStrengthAluminum / stress;
-        Library.Log($"  Max bending stress: {stress:F1} MPa (yield: {fYieldStrengthAluminum} MPa)");
-        Library.Log($"  Safety factor vs yield: {stressSafety:F1}x (target > {fSafetyFactor:F1})");
+        Log($"  Max bending stress: {stress:F1} MPa (yield: {fYieldStrengthAluminum} MPa)");
+        Log($"  Safety factor vs yield: {stressSafety:F1}x (target > {fSafetyFactor:F1})");
 
         // What wall thickness would give L/1000 stiffness?
         float targetDefl = fSpan / 1000f;
         float tRequired = FindWallThicknessForDeflection(b, h, fSpan, F, E, targetDefl);
-        Library.Log($"  Wall thickness for L/1000 stiffness: {tRequired:F1} mm");
+        Log($"  Wall thickness for L/1000 stiffness: {tRequired:F1} mm");
 
         // What wall thickness to stay below yield/safetyFactor?
         float tYield = FindWallThicknessForStress(b, h, fSpan, F, E,
             fYieldStrengthAluminum / fSafetyFactor);
-        Library.Log($"  Wall thickness for yield/{fSafetyFactor:F0}: {tYield:F1} mm");
+        Log($"  Wall thickness for yield/{fSafetyFactor:F0}: {tYield:F1} mm");
 
         float tRec = MathF.Max(tRequired, tYield);
         string verdict = tRec <= t ? "PASS" : "UNDERSIZED";
-        Library.Log($"  RECOMMENDATION: min wall = {tRec:F1} mm (current: {t:F0} mm) [{verdict}]");
+        Log($"  RECOMMENDATION: min wall = {tRec:F1} mm (current: {t:F0} mm) [{verdict}]");
 
-        Library.Log("");
+        // Store results for web API
+        s_fBridgeDeflectionMm = deflection;
+        s_fBridgeSafetyFactor = stressSafety;
+
+        Log("");
     }
 
     // =====================================================================
@@ -218,17 +233,21 @@ public static partial class Picocnc
 
         int nRibsPerSide = (int)(fBaseOuterY / fRibSpacing);
 
-        Library.Log("=== BASE FRAME RIB ANALYSIS ===");
-        Library.Log($"  Rib: {t:F0}mm thick, {h:F0}mm tall, {w:F0}mm spacing");
-        Library.Log($"  Buckling load: {Pcr:F0} N ({Pcr / 9.81f:F1} kg)");
-        Library.Log($"  Rib spacing at {fRibSpacing:F0}mm — ~{nRibsPerSide} ribs per frame side");
+        Log("=== BASE FRAME RIB ANALYSIS ===");
+        Log($"  Rib: {t:F0}mm thick, {h:F0}mm tall, {w:F0}mm spacing");
+        Log($"  Buckling load: {Pcr:F0} N ({Pcr / 9.81f:F1} kg)");
+        Log($"  Rib spacing at {fRibSpacing:F0}mm — ~{nRibsPerSide} ribs per frame side");
 
         // Compare to estimated machine weight on base
         float fEstimatedWeight = fGantryBridgeY * fGantryBridgeZ * fBridgeSpanX * fDensityAluminum / 1000f;
-        Library.Log($"  Estimated gantry weight: ~{fEstimatedWeight:F1} kg");
-        Library.Log($"  Per-rib buckling safety: {Pcr / (fEstimatedWeight * 9.81f * fSafetyFactor):F1}x");
+        float fRibBucklingSafety = Pcr / (fEstimatedWeight * 9.81f * fSafetyFactor);
+        Log($"  Estimated gantry weight: ~{fEstimatedWeight:F1} kg");
+        Log($"  Per-rib buckling safety: {fRibBucklingSafety:F1}x");
 
-        Library.Log("");
+        // Store results for web API
+        s_fBaseRibBucklingSafety = fRibBucklingSafety;
+
+        Log("");
     }
 
     // =====================================================================
@@ -275,15 +294,15 @@ public static partial class Picocnc
         float radiusGyration = MathF.Sqrt(Imin / area);
         float slenderness = (K * L) / radiusGyration;
 
-        Library.Log("=== UPRIGHT ANALYSIS ===");
-        Library.Log($"  Column: {a:F0}x{b:F0}mm, height: {L:F0}mm");
-        Library.Log($"  Critical buckling load: {Pcr:F0} N ({Pcr / 9.81f:F1} kg)");
-        Library.Log($"  Estimated gantry+bridge weight: ~{fBridgeMass:F1} kg");
-        Library.Log($"  Estimated load per upright: ~{fUprightLoad:F0} N ({fTotalPerUpright:F1} kg)");
-        Library.Log($"  Slenderness ratio: {slenderness:F1} (stocky < 50, slender > 100)");
+        Log("=== UPRIGHT ANALYSIS ===");
+        Log($"  Column: {a:F0}x{b:F0}mm, height: {L:F0}mm");
+        Log($"  Critical buckling load: {Pcr:F0} N ({Pcr / 9.81f:F1} kg)");
+        Log($"  Estimated gantry+bridge weight: ~{fBridgeMass:F1} kg");
+        Log($"  Estimated load per upright: ~{fUprightLoad:F0} N ({fTotalPerUpright:F1} kg)");
+        Log($"  Slenderness ratio: {slenderness:F1} (stocky < 50, slender > 100)");
 
         float buckleSafety = Pcr / (fUprightLoad * fSafetyFactor + fCuttingForceZ * fSafetyFactor);
-        Library.Log($"  Buckling safety factor: {buckleSafety:F1}x (target > {fSafetyFactor:F1})");
+        Log($"  Buckling safety factor: {buckleSafety:F1}x (target > {fSafetyFactor:F1})");
 
         string slendernessVerdict;
         if (slenderness < 50f)
@@ -292,9 +311,13 @@ public static partial class Picocnc
             slendernessVerdict = "intermediate (verify with Johnson formula)";
         else
             slendernessVerdict = "slender (Euler buckling governs)";
-        Library.Log($"  Verdict: {slendernessVerdict}");
+        Log($"  Verdict: {slendernessVerdict}");
 
-        Library.Log("");
+        // Store results for web API
+        s_fUprightBucklingSafety = buckleSafety;
+        s_fUprightSlenderness = slenderness;
+
+        Log("");
     }
 
     // =====================================================================
@@ -336,21 +359,24 @@ public static partial class Picocnc
 
         float fBucklingSafety = Pcr / (fAxialForce * fSafetyFactor);
 
-        Library.Log("=== LEAD SCREW ANALYSIS ===");
-        Library.Log($"  T12 screw, {L:F0}mm length (Y-axis — longest span)");
-        Library.Log($"  Section: d={d:F0}mm, A={A:F1}mm², I={I:F1}mm⁴");
-        Library.Log($"  Critical buckling load: {Pcr:F0} N ({Pcr / 9.81f:F1} kg)");
-        Library.Log($"  Critical speed (whirling): {Ncr:F0} RPM");
-        Library.Log($"  Motor axial force (1.2Nm @ T12x2): {fAxialForce:F0} N");
-        Library.Log($"  Buckling safety factor: {fBucklingSafety:F1}x (target > {fSafetyFactor:F1})");
+        Log("=== LEAD SCREW ANALYSIS ===");
+        Log($"  T12 screw, {L:F0}mm length (Y-axis — longest span)");
+        Log($"  Section: d={d:F0}mm, A={A:F1}mm², I={I:F1}mm⁴");
+        Log($"  Critical buckling load: {Pcr:F0} N ({Pcr / 9.81f:F1} kg)");
+        Log($"  Critical speed (whirling): {Ncr:F0} RPM");
+        Log($"  Motor axial force (1.2Nm @ T12x2): {fAxialForce:F0} N");
+        Log($"  Buckling safety factor: {fBucklingSafety:F1}x (target > {fSafetyFactor:F1})");
+
+        // Store results for web API
+        s_fLeadScrewBucklingSafety = fBucklingSafety;
 
         // Practical guidance
         if (Ncr < 500f)
-            Library.Log($"  WARNING: Whirling speed below 500 RPM — consider " +
+            Log($"  WARNING: Whirling speed below 500 RPM — consider " +
                 $"end-bearing or larger screw diameter for high-speed rapids.");
         else
-            Library.Log($"  Whirling speed OK for typical stepper motor operation (< {Ncr * 0.8f:F0} RPM safe limit).");
+            Log($"  Whirling speed OK for typical stepper motor operation (< {Ncr * 0.8f:F0} RPM safe limit).");
 
-        Library.Log("");
+        Log("");
     }
 }

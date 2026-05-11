@@ -10,7 +10,7 @@ public static partial class Picocnc
     /// </summary>
     public static Voxels voxConstructUprights()
     {
-        Library.Log("Building gantry uprights...");
+        Log("Building gantry uprights...");
 
         Voxels voxUprights = new();
 
@@ -44,7 +44,7 @@ public static partial class Picocnc
                 float fGY = fMidY + fYSign * (fUprightY / 2f + fGussetSize / 4f);
                 Voxels voxGussetY = voxBox(
                     new Vector3(fUprightX + fGussetSize, fGussetThick, fGussetSize),
-                    new Vector3(fX, fGY, fBaseZ + fGussetSize / 2f));
+                    new Vector3(fX, fGY, fBaseZ + fGussetSize / 2f + 20f));
                 voxGussets += voxGussetY;
             }
 
@@ -54,14 +54,14 @@ public static partial class Picocnc
                 float fGX = fX + fXSign * (fUprightX / 2f + fGussetSize / 4f);
                 Voxels voxGussetX = voxBox(
                     new Vector3(fGussetThick, fUprightY + fGussetSize, fGussetSize),
-                    new Vector3(fGX, fMidY, fBaseZ + fGussetSize / 2f));
+                    new Vector3(fGX, fMidY, fBaseZ + fGussetSize / 2f + 20f));
                 voxGussets += voxGussetX;
             }
 
-            // --- Top mounting plate ---
+            // --- Top mounting plate (narrowed to clear X rail end supports) ---
             float fPlateThick = 12f;
             Voxels voxTopPlate = voxBox(
-                new Vector3(fUprightX + 20f, fUprightY + 20f, fPlateThick),
+                new Vector3(fUprightX - 14f, fUprightY + 20f, fPlateThick),
                 new Vector3(fX, fMidY, fBaseZ + fUprightZ + fPlateThick / 2f));
 
             // Bolt holes in top plate (vertical)
@@ -80,7 +80,7 @@ public static partial class Picocnc
             voxUprights += voxTopPlate;
         }
 
-        Library.Log("Gantry uprights done.");
+        Log("Gantry uprights done.");
         return voxUprights;
     }
 }

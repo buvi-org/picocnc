@@ -11,7 +11,7 @@ public static partial class Picocnc
     /// </summary>
     public static Voxels voxConstructXRails()
     {
-        Library.Log("Building X-axis rails...");
+        Log("Building X-axis rails...");
 
         float fMidY = fBaseOuterY / 2f;
         float fBridgeMidX = fBaseOuterX / 2f;
@@ -202,7 +202,7 @@ public static partial class Picocnc
             voxXRails += voxBearing;
         }
 
-        Library.Log("X-axis rails done.");
+        Log("X-axis rails done.");
         return voxXRails;
     }
 }

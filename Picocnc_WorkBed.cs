@@ -10,10 +10,17 @@ public static partial class Picocnc
     /// </summary>
     public static Voxels voxConstructWorkBed()
     {
-        Library.Log("Building work bed...");
+        Log("Building work bed...");
 
-        float fTableX = fWorkAreaX + 40f;    // slight overhang beyond work area
-        float fTableY = fWorkAreaY + 40f;
+        // Table fits between Y bearing blocks (which extend inward from rails).
+        // Bearing body width = fRailWidth+10 (30mm), so bearing extends 5mm
+        // inward from each rail inner edge. Inter-bearing space:
+        //   fBaseOuterX - 2*(fRailInsetX + (fRailWidth+10)/2)
+        //   = fBaseOuterX - 2*fRailInsetX - fRailWidth - 10
+        // Table must fit between upright columns: space = base - 2*railInset - uprightX
+        float fMaxTableX = fBaseOuterX - 2f * fRailInsetX - fUprightX - 6f; // 3mm clearance per side
+        float fTableX = MathF.Min(fWorkAreaX + 40f, fMaxTableX);
+        float fTableY = MathF.Min(fWorkAreaY + 40f, fBaseOuterY);
         float fTableZ = fTableThick;
 
         Vector3 vecTableCenter = new(
@@ -191,7 +198,7 @@ public static partial class Picocnc
         // ============================================================
         Voxels voxWorkBed = voxTable + voxSpoil + voxTNuts + voxFence + voxClamp1 + voxClamp2;
 
-        Library.Log("Work bed done.");
+        Log("Work bed done.");
         return voxWorkBed;
     }
 

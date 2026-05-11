@@ -11,7 +11,7 @@ public static partial class Picocnc
     /// </summary>
     public static Voxels voxConstructLeadScrews()
     {
-        Library.Log("Building lead screws...");
+        Log("Building lead screws...");
 
         float fMidY = fBaseOuterY / 2f;
         float fBridgeMidX = fBaseOuterX / 2f;
@@ -22,10 +22,9 @@ public static partial class Picocnc
         // --- Y-axis lead screw ---
         // Runs along Y, centered between the two Y rails
         float fYScrewX = fBaseOuterX / 2f;
-        float fYScrewZ = fBaseOuterZ + fRailHeight + fLeadScrewDia / 2f;
 
-        Vector3 vecYScrewStart = new Vector3(fYScrewX, 50f, fYScrewZ);
-        Vector3 vecYScrewEnd   = new Vector3(fYScrewX, fBaseOuterY - 50f, fYScrewZ);
+        Vector3 vecYScrewStart = new Vector3(fYScrewX, fYScrewStartY, fYScrewZ);
+        Vector3 vecYScrewEnd   = new Vector3(fYScrewX, fYScrewEndY, fYScrewZ);
 
         voxAllScrews += voxConstructScrew(vecYScrewStart, vecYScrewEnd);
 
@@ -43,12 +42,16 @@ public static partial class Picocnc
         voxAllScrews += voxConstructEndBearing(vecYScrewEnd,   new Vector3(0, 1, 0));
 
         // --- X-axis lead screw ---
-        // Runs along X, on the gantry bridge front face
-        float fXScrewY = fMidY - fGantryBridgeY / 2f - fLeadScrewDia;
+        // Runs along X, on the gantry bridge front face.
+        // X rails sit at the bridge front face (Y=fBridgeYFront=220) with
+        // radius 7.5mm → rails occupy Y=[212.5, 227.5]. Screw core radius
+        // is 6mm, thread rings 7mm. Offset screw forward (-Y) to clear rails.
+        float fXScrewY = fMidY - fGantryBridgeY / 2f - fLeadScrewDia - 7f;
+        // Y=201 → screw rings Y=[194,208], X rails Y=[212.5,227.5], 4.5mm gap
         float fXScrewZ = fBridgeZ;
 
-        Vector3 vecXScrewStart = new Vector3(fRailInsetX + fUprightX / 2f + 20f, fXScrewY, fXScrewZ);
-        Vector3 vecXScrewEnd   = new Vector3(fBaseOuterX - fRailInsetX - fUprightX / 2f - 20f, fXScrewY, fXScrewZ);
+        Vector3 vecXScrewStart = new Vector3(fXScrewStartX, fXScrewY, fXScrewZ);
+        Vector3 vecXScrewEnd   = new Vector3(fXScrewEndX, fXScrewY, fXScrewZ);
 
         voxAllScrews += voxConstructScrew(vecXScrewStart, vecXScrewEnd);
 
@@ -62,26 +65,25 @@ public static partial class Picocnc
         voxAllScrews += voxShaftCollar(vecXScrewEnd,   new Vector3(1, 0, 0));
 
         // --- Z-axis lead screw ---
-        // Runs along Z, on the Z-axis back plate
-        float fPlateYFront = fMidY - fGantryBridgeY / 2f - fZPlateY;
+        // Runs along Z, behind the spindle flange and in front of the Z back plate
         float fZScrewBotZ = fBridgeZ - fZPlateZ / 2f + 20f;
         float fZScrewTopZ = fBridgeZ + fZPlateZ / 2f - 20f;
 
-        Vector3 vecZScrewStart = new Vector3(fBridgeMidX, fPlateYFront - 35f, fZScrewBotZ);
-        Vector3 vecZScrewEnd   = new Vector3(fBridgeMidX, fPlateYFront - 35f, fZScrewTopZ);
+        Vector3 vecZScrewStart = new Vector3(fBridgeMidX, fZScrewY, fZScrewBotZ);
+        Vector3 vecZScrewEnd   = new Vector3(fBridgeMidX, fZScrewY, fZScrewTopZ);
 
         voxAllScrews += voxConstructScrew(vecZScrewStart, vecZScrewEnd);
 
         // Z nut: at Z carriage height
         voxAllScrews += voxConstructNutBlock(
-            new Vector3(fBridgeMidX, fPlateYFront - 35f, fBridgeZ),
+            new Vector3(fBridgeMidX, fZScrewY, fBridgeZ),
             new Vector3(0, 0, 1));
 
         // Z shaft collars at each end
         voxAllScrews += voxShaftCollar(vecZScrewStart, new Vector3(0, 0, 1));
         voxAllScrews += voxShaftCollar(vecZScrewEnd,   new Vector3(0, 0, 1));
 
-        Library.Log("Lead screws done.");
+        Log("Lead screws done.");
         return voxAllScrews;
     }
 

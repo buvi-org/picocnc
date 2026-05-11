@@ -36,15 +36,15 @@ public static partial class Picocnc
     /// </summary>
     public static void RunFEAnalysis()
     {
-        Library.Log("\n============================================================");
-        Library.Log("===  FINITE ELEMENT ANALYSIS (BriefFiniteElement.NET)  ====");
-        Library.Log("============================================================");
+        Log("\n============================================================");
+        Log("===  FINITE ELEMENT ANALYSIS (BriefFiniteElement.NET)  ====");
+        Log("============================================================");
 
         RunGantryBridgeFEA();
         RunFEAComparison();
 
-        Library.Log("===  FEA COMPLETE  =========================================");
-        Library.Log("============================================================\n");
+        Log("===  FEA COMPLETE  =========================================");
+        Log("============================================================\n");
     }
 
     // =====================================================================
@@ -174,15 +174,15 @@ public static partial class Picocnc
         sw.Stop();
 
         // --- Log ---
-        Library.Log("=== FEA GANTRY BRIDGE (Euler-Bernoulli beam) ===");
-        Library.Log($"  Elements: {nElements} beam elements over {fSpan:F0} mm span");
-        Library.Log($"  Section: hollow rect {b:F0} x {h:F0} mm, wall {t:F0} mm");
-        Library.Log($"  A = {A:F0} mm^2, Iy = {Iy / 1e6f:F2} x 10^6 mm^4");
-        Library.Log($"  Load: Fy={Fy:F0}N, Fz={Fz:F0}N at midspan");
-        Library.Log($"  Max deflection: {fMaxDefl:F3} mm  (Y: {fDeflY:F3}, Z: {fDeflZ:F3})");
-        Library.Log($"  Max bending stress: {fMaxStress:F1} MPa");
-        Library.Log($"  Safety factor vs yield: {fSafety:F1}x");
-        Library.Log($"  Solve time: {sw.Elapsed.TotalMilliseconds:F1} ms");
+        Log("=== FEA GANTRY BRIDGE (Euler-Bernoulli beam) ===");
+        Log($"  Elements: {nElements} beam elements over {fSpan:F0} mm span");
+        Log($"  Section: hollow rect {b:F0} x {h:F0} mm, wall {t:F0} mm");
+        Log($"  A = {A:F0} mm^2, Iy = {Iy / 1e6f:F2} x 10^6 mm^4");
+        Log($"  Load: Fy={Fy:F0}N, Fz={Fz:F0}N at midspan");
+        Log($"  Max deflection: {fMaxDefl:F3} mm  (Y: {fDeflY:F3}, Z: {fDeflZ:F3})");
+        Log($"  Max bending stress: {fMaxStress:F1} MPa");
+        Log($"  Safety factor vs yield: {fSafety:F1}x");
+        Log($"  Solve time: {sw.Elapsed.TotalMilliseconds:F1} ms");
 
         // --- Store for comparison ---
         s_oFEAReport = new FEAReport
@@ -195,7 +195,7 @@ public static partial class Picocnc
             fComputationMs   = sw.Elapsed.TotalMilliseconds
         };
 
-        Library.Log("");
+        Log("");
     }
 
     // =====================================================================
@@ -211,7 +211,7 @@ public static partial class Picocnc
     {
         if (s_oFEAReport == null)
         {
-            Library.Log("FEA comparison skipped — no FEA report available.");
+            Log("FEA comparison skipped — no FEA report available.");
             return;
         }
 
@@ -245,21 +245,21 @@ public static partial class Picocnc
         float fStressDiff = MathF.Abs(fea.fMaxStressMpa - fStressHand);
         float fStressPct  = fStressHand > 0.1f ? (fStressDiff / fStressHand) * 100f : 0f;
 
-        Library.Log("=== FEA vs HAND-ROLLED COMPARISON ===");
-        Library.Log($"  Hand-rolled deflection (Euler-Bernoulli):  {fDeflHand:F3} mm");
-        Library.Log($"  FEA deflection (10-element beam):          {fea.fMaxDeflectionMm:F3} mm");
-        Library.Log($"  Difference: {fDeflDiff:F3} mm ({fDeflPct:F1}%)");
-        Library.Log($"  Hand-rolled stress: {fStressHand:F1} MPa");
-        Library.Log($"  FEA stress:         {fea.fMaxStressMpa:F1} MPa");
-        Library.Log($"  Stress difference:  {fStressDiff:F1} MPa ({fStressPct:F1}%)");
+        Log("=== FEA vs HAND-ROLLED COMPARISON ===");
+        Log($"  Hand-rolled deflection (Euler-Bernoulli):  {fDeflHand:F3} mm");
+        Log($"  FEA deflection (10-element beam):          {fea.fMaxDeflectionMm:F3} mm");
+        Log($"  Difference: {fDeflDiff:F3} mm ({fDeflPct:F1}%)");
+        Log($"  Hand-rolled stress: {fStressHand:F1} MPa");
+        Log($"  FEA stress:         {fea.fMaxStressMpa:F1} MPa");
+        Log($"  Stress difference:  {fStressDiff:F1} MPa ({fStressPct:F1}%)");
 
         if (fDeflPct > 5f)
-            Library.Log("  NOTE: Difference >5% — verify cross-section properties match.");
+            Log("  NOTE: Difference >5% — verify cross-section properties match.");
         else if (fDeflPct > 1f)
-            Library.Log("  NOTE: Small difference due to 10-element discretization vs continuous solution.");
+            Log("  NOTE: Small difference due to 10-element discretization vs continuous solution.");
         else
-            Library.Log("  Excellent agreement (<1% difference). Hand-rolled solver validated.");
+            Log("  Excellent agreement (<1% difference). Hand-rolled solver validated.");
 
-        Library.Log("");
+        Log("");
     }
 }

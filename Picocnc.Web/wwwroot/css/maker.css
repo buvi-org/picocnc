@@ -1,0 +1,528 @@
+/* ==========================================================================
+   maker.css — PicoCNC Web Maker stylesheet
+   Dark theme, three-panel grid layout for CNC configuration.
+   ========================================================================== */
+
+/* ── Reset & Base ─────────────────────────────────────────────────────── */
+
+*, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --bg-deep:    #1a1a2e;
+    --bg-panel:   #16213e;
+    --bg-section: #0d1730;
+    --border:     #0f3460;
+    --border-hov: #1a4a7a;
+    --text:       #e0e0e0;
+    --text-dim:   #7b8bb3;
+    --text-muted: #4a5a7a;
+    --accent:     #e94560;
+    --accent-hov: #d63850;
+    --green:      #66cc66;
+    --green-bg:   #0a3a0a;
+    --yellow:     #ffcc00;
+    --yellow-bg:  #4a3a00;
+    --red:        #cc6666;
+    --red-bg:     #3a0a0a;
+    --orange:     #ff8844;
+    --scrollbar-track: #0f3460;
+    --scrollbar-thumb: #1a4a7a;
+}
+
+html, body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg-deep);
+    color: var(--text);
+    height: 100vh;
+    overflow: hidden;
+    font-size: 15px;
+}
+
+/* ── Three-Panel Grid ────────────────────────────────────────────────── */
+
+#app {
+    display: grid;
+    grid-template-columns: 320px 1fr 320px;
+    grid-template-rows: 1fr;
+    height: 100vh;
+    gap: 0;
+}
+
+/* ── Left Panel: Configuration ───────────────────────────────────────── */
+
+#config-panel {
+    background: var(--bg-panel);
+    padding: 16px 20px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+}
+
+#config-panel h1 {
+    font-size: 1.3em;
+    margin-bottom: 0.6em;
+    color: var(--accent);
+    letter-spacing: 0.5px;
+    font-weight: 700;
+}
+
+/* Backend-not-available banner */
+.api-banner {
+    background: var(--yellow-bg);
+    color: var(--yellow);
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 0.78em;
+    margin-bottom: 14px;
+    text-align: center;
+    line-height: 1.4;
+}
+
+/* ── Parameter Sections ──────────────────────────────────────────────── */
+
+.param-section {
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+}
+
+.param-section:last-of-type {
+    border-bottom: none;
+}
+
+.param-section h3 {
+    font-size: 0.72em;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--text-dim);
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.param-row {
+    margin-bottom: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+}
+
+.param-row label {
+    font-size: 0.82em;
+    color: #b0b8cc;
+    min-width: 105px;
+    flex-shrink: 0;
+}
+
+.param-row input[type="range"] {
+    flex: 1;
+    min-width: 70px;
+    accent-color: var(--accent);
+    height: 4px;
+}
+
+.param-row select {
+    flex: 1;
+    background: var(--border);
+    color: var(--text);
+    border: 1px solid var(--border-hov);
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 0.82em;
+    cursor: pointer;
+    outline: none;
+}
+
+.param-row select:focus {
+    border-color: var(--accent);
+}
+
+.param-value {
+    font-size: 0.75em;
+    color: var(--text-dim);
+    min-width: 56px;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+/* ── Presets ─────────────────────────────────────────────────────────── */
+
+.preset-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+/* ── Buttons ─────────────────────────────────────────────────────────── */
+
+button {
+    cursor: pointer;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    font-family: inherit;
+    font-size: inherit;
+    transition: background 0.2s, transform 0.1s, opacity 0.2s;
+}
+
+button:active {
+    transform: scale(0.97);
+}
+
+.btn-primary {
+    width: 100%;
+    padding: 13px;
+    background: var(--accent);
+    color: white;
+    font-size: 0.95em;
+    margin-top: 12px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.btn-primary:hover {
+    background: var(--accent-hov);
+}
+
+.btn-primary:disabled {
+    background: #553344;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.btn-preset {
+    background: var(--border);
+    color: #b0b8cc;
+    padding: 7px 10px;
+    font-size: 0.76em;
+    border-radius: 4px;
+    margin: 1px;
+}
+
+.btn-preset:hover {
+    background: var(--border-hov);
+    color: white;
+}
+
+/* ── Build Status ────────────────────────────────────────────────────── */
+
+#build-status-area {
+    margin-top: 12px;
+}
+
+#build-status {
+    padding: 8px 10px;
+    border-radius: 4px 4px 0 0;
+    font-size: 0.78em;
+    text-align: center;
+    min-height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    word-break: break-word;
+}
+
+/* Progress bar */
+#build-progress-bar {
+    height: 4px;
+    background: var(--border);
+    border-radius: 0 0 4px 4px;
+    overflow: hidden;
+}
+
+#build-progress-fill {
+    height: 100%;
+    width: 0%;
+    background: var(--accent);
+    transition: width 0.3s ease;
+}
+
+#build-progress-fill.done {
+    background: var(--green);
+}
+
+.status-building { background: var(--yellow-bg); color: var(--yellow); }
+.status-ok       { background: var(--green-bg);  color: var(--green);  }
+.status-error    { background: var(--red-bg);    color: var(--red);    }
+
+/* ── Center Panel: 3D Viewer ─────────────────────────────────────────── */
+
+#viewer-container {
+    position: relative;
+    background: var(--bg-deep);
+}
+
+#viewer {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+/* ── Right Panel: Info (Components + BOM + Analysis) ─────────────────── */
+
+#info-panel {
+    background: var(--bg-panel);
+    padding: 16px 20px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    border-left: 1px solid var(--border);
+}
+
+#info-panel h3 {
+    font-size: 0.8em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 14px 0 8px;
+    font-weight: 600;
+}
+
+#info-panel h3:first-child {
+    margin-top: 0;
+}
+
+/* ── Component Visibility Toggles ────────────────────────────────────── */
+
+.comp-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 6px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.82em;
+    color: #c0c8d8;
+    transition: background 0.15s;
+    user-select: none;
+}
+
+.comp-toggle:hover {
+    background: var(--border);
+}
+
+.comp-toggle input[type="checkbox"] {
+    accent-color: var(--accent);
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
+}
+
+.comp-swatch {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+    border: 1px solid rgba(255,255,255,0.15);
+    flex-shrink: 0;
+}
+
+/* ── BOM Table ───────────────────────────────────────────────────────── */
+
+.bom-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.76em;
+    margin-top: 6px;
+}
+
+.bom-table thead th {
+    padding: 5px 4px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-dim);
+    font-weight: 600;
+    font-size: 0.9em;
+}
+
+.bom-table tbody td {
+    padding: 5px 4px;
+    border-bottom: 1px solid rgba(15, 52, 96, 0.5);
+    color: #c0c8d8;
+}
+
+.bom-qty {
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+}
+
+.bom-spec {
+    font-size: 0.9em;
+    color: var(--text-dim);
+}
+
+/* ── Analysis Grid ───────────────────────────────────────────────────── */
+
+.analysis-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 6px;
+}
+
+.analysis-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 0;
+    font-size: 0.82em;
+}
+
+.analysis-label {
+    color: var(--text-dim);
+}
+
+.analysis-value {
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--text);
+}
+
+.analysis-value.ok   { color: var(--green); }
+.analysis-value.warn { color: var(--orange); }
+
+/* ── Utility ─────────────────────────────────────────────────────────── */
+
+.muted {
+    color: var(--text-muted);
+    font-size: 0.82em;
+}
+
+.warn {
+    color: var(--orange);
+}
+
+/* ── Scrollbar ───────────────────────────────────────────────────────── */
+
+::-webkit-scrollbar          { width: 6px; }
+::-webkit-scrollbar-track    { background: var(--scrollbar-track); }
+::-webkit-scrollbar-thumb    { background: var(--scrollbar-thumb); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--border-hov); }
+
+/* Scrollbar for Firefox */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+/* ── Collision Details in right panel ───────────────────────────────── */
+
+.collision-details {
+    max-height: 200px;
+    overflow-y: auto;
+    margin-top: 6px;
+    font-size: 0.74em;
+    font-family: 'Consolas', 'Cascadia Code', monospace;
+    line-height: 1.5;
+}
+
+.collision-expected {
+    color: var(--text-dim);
+    padding: 2px 4px;
+}
+
+.collision-warn {
+    color: var(--red);
+    background: rgba(204, 102, 102, 0.1);
+    padding: 2px 4px;
+    border-radius: 2px;
+    margin: 1px 0;
+}
+
+/* ── Collision warning overlay in viewer ────────────────────────────── */
+
+.viewer-collision-warning {
+    position: absolute;
+    bottom: 16px;
+    left: 16px;
+    right: 16px;
+    z-index: 10;
+    pointer-events: none;
+}
+
+.collision-warn-box {
+    background: rgba(180, 30, 30, 0.92);
+    color: #fff;
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-size: 0.85em;
+    border: 1px solid rgba(255, 100, 100, 0.5);
+    box-shadow: 0 2px 12px rgba(255, 0, 0, 0.2);
+}
+
+.collision-warn-box strong {
+    display: block;
+    margin-bottom: 4px;
+}
+
+.collision-warn-detail {
+    font-size: 0.85em;
+    opacity: 0.9;
+    margin-top: 4px;
+    line-height: 1.5;
+}
+
+/* ── Viewer Error Overlay ────────────────────────────────────────────── */
+
+.viewer-error-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(26, 26, 46, 0.85);
+    z-index: 10;
+    pointer-events: none;
+}
+
+.viewer-error-msg {
+    text-align: center;
+    color: var(--text-dim);
+    max-width: 320px;
+}
+
+.viewer-error-msg p {
+    color: var(--red);
+    font-size: 0.9em;
+    margin: 8px 0;
+}
+
+.viewer-error-msg small {
+    color: var(--text-muted);
+    font-size: 0.75em;
+}
+
+.viewer-error-icon {
+    font-size: 2em;
+    color: var(--red);
+}
+
+/* ── Responsive: single column on small screens ──────────────────────── */
+
+@media (max-width: 900px) {
+    #app {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr auto;
+    }
+
+    #config-panel {
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+        max-height: 40vh;
+    }
+
+    #info-panel {
+        border-left: none;
+        border-top: 1px solid var(--border);
+        max-height: 30vh;
+    }
+
+    #viewer-container {
+        min-height: 300px;
+    }
+}

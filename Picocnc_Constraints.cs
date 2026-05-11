@@ -47,26 +47,30 @@ public static partial class Picocnc
     public static float fSpindleClampZ => fBridgeZ - fCarriageZ / 2f;
 
     // === Motor positions ===
-    public static float fYMotorY => fBaseOuterY - 30f;
+    public static float fYMotorY => fBaseOuterY - 20f;  // back from table edge (Y max 470)
     public static float fXMotorX => fRailInsetX + fUprightX + 30f;
     public static float fZMotorZ => fBridgeZ + fZPlateZ / 2f - 20f;
     public static float fZMotorY => fBridgeYFront - fZPlateY + fNema23Width / 2f;
 
     // === Lead screw positions ===
-    public static float fYScrewStartY => 50f;
-    public static float fYScrewEndY   => fBaseOuterY - 50f;
-    public static float fYScrewZ      => fBaseOuterZ + fRailHeight + fLeadScrewDia / 2f;
-    public static float fXScrewStartX => fRailInsetX + fUprightX / 2f + 20f;
-    public static float fXScrewEndX   => fBaseOuterX - fRailInsetX - fUprightX / 2f - 20f;
+    public static float fYScrewStartY => 65f;
+    public static float fYScrewEndY   => fBaseOuterY - 65f;
+    // Y screw Z: positioned above workbed + spoil board.
+    // Thread rings are 14mm OD (7mm radius), larger than the 6mm nominal screw radius.
+    // Spoil board adds 18mm on top of table. 15mm clearance from ring bottom to spoil board top.
+    public static float fYScrewZ      => fBaseOuterZ + fTableThick + 18f + 15f + 7f;
+    public static float fXScrewStartX => fRailInsetX + fUprightX / 2f + 30f;
+    public static float fXScrewEndX   => fBaseOuterX - fRailInsetX - fUprightX / 2f - 30f;
     public static float fXScrewZ      => fBridgeZ;
-    public static float fZScrewY      => fZPlateFrontY - 35f;       // 35mm behind plate front
+    public static float fZScrewY      => fZPlateFrontY - 28f;       // Y=192: behind flange (Ymax~174), ahead of Z plate (Ymin=205)
     public static float fZScrewBotZ   => fBridgeZ - fZPlateZ / 2f + 20f;
     public static float fZScrewTopZ   => fBridgeZ + fZPlateZ / 2f - 20f;
 
     // === Drag chain positions ===
     public static float fYTrayZ         => fBaseOuterZ + 10f;
-    public static float fYTrayX         => fBaseOuterX - fRailInsetX + fRailWidth + 20f;
+    public static float fYTrayX         => fBaseOuterX - fRailInsetX + fRailWidth + 25f;
     public static float fXTrayZ         => fBridgeTopZ + 5f;
+    public static float fXTrayY         => fMidY - fGantryBridgeY / 2f - fChainWidth - 50f; // Y=140: clears Z carriage (Ymin=160) + spindle jacket (Ymax=165)
     public static float fChainFloorThick => 3f;
     public static float fChainWallThick  => 3f;
     public static float fChainTrayWidth  => fChainWidth + 6f;

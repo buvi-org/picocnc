@@ -296,7 +296,7 @@ public static partial class Picocnc
     /// </summary>
     public static void VisualizeToolpath(List<Vector3> aPositions)
     {
-        Library.Log($"Visualizing toolpath: {aPositions.Count} points");
+        Log($"Visualizing toolpath: {aPositions.Count} points");
 
         Voxels voxToolpath = new();
         float fRadius = 1.0f; // thin visible line at 2 mm voxel resolution
@@ -315,7 +315,7 @@ public static partial class Picocnc
         }
 
         Library.oViewer().Add(voxToolpath, 13);
-        Library.Log("Toolpath added to viewer (group 13).");
+        Log("Toolpath added to viewer (group 13).");
     }
 
     /// <summary>
@@ -327,14 +327,14 @@ public static partial class Picocnc
     {
         if (!File.Exists(strFilePath))
         {
-            Library.Log($"G-code file not found: {strFilePath}");
+            Log($"G-code file not found: {strFilePath}");
             return;
         }
 
-        Library.Log($"Loading G-code: {strFilePath}");
+        Log($"Loading G-code: {strFilePath}");
 
         List<Vector3> aPositions = ParseGCodeFile(strFilePath);
-        Library.Log($"Parsed {aPositions.Count} tool positions.");
+        Log($"Parsed {aPositions.Count} tool positions.");
 
         if (aPositions.Count > 0)
         {
@@ -348,14 +348,14 @@ public static partial class Picocnc
             float fMinZ = aPositions.Min(p => p.Z);
             float fMaxZ = aPositions.Max(p => p.Z);
 
-            Library.Log($"Toolpath bounds X: [{fMinX:F1}, {fMaxX:F1}]");
-            Library.Log($"Toolpath bounds Y: [{fMinY:F1}, {fMaxY:F1}]");
-            Library.Log($"Toolpath bounds Z: [{fMinZ:F1}, {fMaxZ:F1}]");
+            Log($"Toolpath bounds X: [{fMinX:F1}, {fMaxX:F1}]");
+            Log($"Toolpath bounds Y: [{fMinY:F1}, {fMaxY:F1}]");
+            Log($"Toolpath bounds Z: [{fMinZ:F1}, {fMaxZ:F1}]");
 
             // Warn if toolpath exceeds work area
             if (fMaxX > fWorkAreaX || fMaxY > fWorkAreaY)
             {
-                Library.Log($"WARNING: Toolpath exceeds work area ({fWorkAreaX}x{fWorkAreaY})!");
+                Log($"WARNING: Toolpath exceeds work area ({fWorkAreaX}x{fWorkAreaY})!");
             }
         }
     }

@@ -8,6 +8,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Picocnc.Web\**" />
+    <Compile Remove="Picocnc_UI.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="PicoGK" Version="2.0.0-beta11" />
     <PackageReference Include="BriefFiniteElement.Net" Version="2.0.5" />
   </ItemGroup>
